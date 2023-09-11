@@ -1,52 +1,57 @@
 import requests
 import time
-from modules import sql_injection, xss, command_injection
+
+from modules import *
 
 
 def scan_api(url):
+    """
+    The `scan_api` function scans an API at a given URL for potential vulnerabilities such as SQL
+    injection, XSS, command injection, insecure deserialization, and authentication bypass.
+
+    :param url: The `url` parameter is a string that represents the URL of the API that you want to scan
+    for vulnerabilities
+    """
     try:
         response = requests.get(url)
         response.raise_for_status()
 
         if response.status_code == 200:
             print(f"Scanning API at {url}...")
-            # Simulating the scanning process 
             time.sleep(2)
 
-            # Checking against SQL Injection
             sql_injection_result = sql_injection.check_sql_injection(response)
-
-            # Check XSS vuln
             xss_result = xss.check_xss(response)
-
-            # Checking against Command Injection
             command_injection_result = command_injection.check_command_injection(
-                response)
+                response
+            )
+            insecure_deserialization_result = (
+                insecure_deserialization.check_insecure_deserialization(
+                    response)
+            )
+            authentication_bypass_result = (
+                authentication_bypass.check_authentication_bypass(response)
+            )
 
             vulnerabilities = []
 
-            if sql_injection_result:
-                vulnerabilities.append(
-                    ("SQL Injection", "Vulnerability detected."))
-
-            if xss_result:
-                vulnerabilities.append(
-                    ("Cross-Site Scripting (XSS)", "Vulnerability detected."))
-
-            if command_injection_result:
-                vulnerabilities.append(
-                    ("Command Injection", "Vulnerability detected."))
+            vulnerabilities.extend(sql_injection_result)
+            vulnerabilities.extend(xss_result)
+            vulnerabilities.extend(command_injection_result)
+            vulnerabilities.extend(insecure_deserialization_result)
+            vulnerabilities.extend(authentication_bypass_result)
 
             if vulnerabilities:
                 print(
                     f"Found {len(vulnerabilities)} potential vulnerabilities:")
-                for vulnerability, result in vulnerabilities:
-                    print(f"- {vulnerability}: {result}")
+                for vulnerability in vulnerabilities:
+                    print(f"- {vulnerability}: Vulnerability detected.")
             else:
                 print("No vulnerabilities found.")
         else:
             print(
-                f"Error: Unable to access the API. Status code: {response.status_code}")
+                f"Error: Unable to access the API. Status code: {response.status_code}"
+            )
 
     except requests.exceptions.HTTPError as http_err:
         print(f"HTTP error occurred: {http_err}")
@@ -64,7 +69,8 @@ def display_help():
 
 def main():
     print("\n=== Welcome to APIGuardian ===")
-    print('''
+    print(
+        """
                __
              .'o '.
             /   .-.\.
@@ -78,7 +84,8 @@ def main():
          /,.__.,\.
 
         <Tool Crafted by Stevemats>
-        ''')
+        """
+    )
     while True:
         print("\nVulnerability Scanner Menu:")
         print("1. Enter URL to scan")

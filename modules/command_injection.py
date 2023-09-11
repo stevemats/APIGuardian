@@ -5,13 +5,13 @@ def check_command_injection(response):
     try:
         # Checking for common Command Injection patterns
         command_injection_patterns = [
-            r';\s*ping\s',
-            r';\s*ls\s',
-            r';\s*cat\s',
-            r';\s*rm\s',
-            r'|',
-            r'&&',
-            r';\s*curl\s'
+            r";\s*ping\s",
+            r";\s*ls\s",
+            r";\s*cat\s",
+            r";\s*rm\s",
+            r"|",
+            r"&&",
+            r";\s*curl\s",
         ]
 
         vulnerabilities = []
